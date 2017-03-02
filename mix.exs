@@ -17,7 +17,8 @@ defmodule Jwt.Mixfile do
   end
 
   defp deps do
-    [{:poison, "~> 2.2 or ~> 3.0"}]
+    [{:poison, "~> 2.2 or ~> 3.0"},
+     {:ex_doc, "~> 0.15", only: :dev}]
   end
 
   defp package do
