@@ -38,30 +38,17 @@ defmodule JWT.Algorithm.RsaTest do
 
   # param validation
   test "sign/3 w unrecognized sha_bits raises" do
-    message = "Invalid sha_bits"
-    assert_raise RuntimeError, message, fn ->
+    assert_raise FunctionClauseError, fn ->
       Rsa.sign(:sha257, @private_key, @signing_input_0)
     end
-  end
-
-  defp invalid_key(private_key, message \\ "Param blank") do
-    assert_raise RuntimeError, message, fn ->
-      Rsa.sign(:sha256, private_key, @signing_input_0)
-    end
-  end
-
-  test "sign/3 w private_key nil raises" do
-    invalid_key(nil, "Param nil")
-  end
-
-  test "sign/3 w private_key empty string raises" do
-    invalid_key("")
   end
 
   test "sign/3 w private_key size < key_bits_min raises" do
     private_key = RsaUtil.private_key(@path_to_keys, "private_key_weak.pem")
     assert byte_size(Rsa.modulus private_key) == 255
-    invalid_key(private_key, "RSA modulus too short")
+    assert_raise JWT.SecurityError, fn ->
+      Rsa.sign(:sha256, private_key, @signing_input_0)
+    end
   end
 
   test "sign/3 w private_key size == key_bits_min (2048) returns a 256 byte mac" do

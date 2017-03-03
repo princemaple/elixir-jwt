@@ -65,21 +65,35 @@ defmodule JWT do
   or {:error, "invalid"} otherwise
 
   ## Example
-      iex> jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJodHRwOi8vZXhhbXBsZS5jb20vaXNfcm9vdCI6dHJ1ZSwiZXhwIjoxMzAwODE5MzgwfQ.Ktfu3EdLz0SpuTIMpMoRZMtZsCATWJHeDEBGrsZE6LI"
+      iex> jwt ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiam9lIiwiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiOnRydWUsImRhdGV0aW1lIjoxMzAwODE5MzgwfQ.8CbXtOJ51MfPLlNTDpMMBHExFZGmqIC2c_hjuY0Dp24"
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
       ...> JWT.verify(jwt, %{key: key})
-      {:ok, %{iss: "joe", exp: 1300819380, "http://example.com/is_root": true}}
+      {:ok, %{"name" => "joe", "datetime" => 1300819380, "http://example.com/is_root" => true}}
 
   see http://tools.ietf.org/html/rfc7519#section-7.2
   """
   @spec verify(binary, binary | map | Keyword.t) :: {:ok, map} | {:error, binary}
   def verify(jwt, options) do
-    key = if is_binary(options), do: options, else: options[:key]
-
-    with {:ok, jws} <- Jws.verify(jwt, algorithm(options), key) do
-      {:ok, extract_payload(jws)}
+    with {:ok, jws} <- Jws.verify(jwt, algorithm(options), unify_key(options)),
+         claims <- extract_payload!(jws),
+         :ok <- JWT.Claim.verify(claims, options)
+    do
+      {:ok, claims}
     else
       {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @spec verify!(binary, binary | map | Keyword.t) :: map | no_return
+  def verify!(jwt, options) do
+    jws = Jws.verify!(jwt, algorithm(options), unify_key(options))
+    claims = extract_payload!(jws)
+
+    with :ok <- JWT.Claim.verify(claims, options) do
+      claims
+    else
+      {:error, rejected_claims} ->
+        raise JWT.ClaimValidationError, type: rejected_claims
     end
   end
 
@@ -87,8 +101,11 @@ defmodule JWT do
     Map.get(options, :alg, @default_algorithm)
   end
 
-  defp extract_payload(jws) do
+  defp unify_key(binary) when is_binary(binary), do: binary
+  defp unify_key(options), do: options[:key]
+
+  defp extract_payload!(jws) do
     [_, encoded_payload, _] = String.split(jws, ".")
-    JWT.Util.decode!(encoded_payload, keys: :atoms)
+    JWT.Coding.decode!(encoded_payload)
   end
 end

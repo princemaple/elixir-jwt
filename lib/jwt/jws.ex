@@ -35,7 +35,7 @@ defmodule JWT.Jws do
   end
 
   defp signing_input(header, payload) do
-    "#{JWT.Util.encode!(header)}.#{Base.url_encode64(payload, padding: false)}"
+    "#{JWT.Coding.encode!(header)}.#{Base.url_encode64(payload, padding: false)}"
   end
 
   defp do_sign(algorithm, key, signing_input) do
@@ -79,7 +79,7 @@ defmodule JWT.Jws do
 
   defp validate_alg(jws, algorithm) do
     [header | _] = String.split(jws, ".")
-    header = JWT.Util.decode!(header)
+    header = JWT.Coding.decode!(header)
     if header["alg"] == algorithm, do: :ok, else: {:error, :unmatched_algorithm}
   end
 

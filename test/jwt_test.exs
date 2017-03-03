@@ -5,7 +5,7 @@ defmodule JWTTest do
 
   @hs256_key "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
   @key_id "test-key"
-  @claims %{iss: "joe", exp: 1300819380, "http://example.com/is_root": true}
+  @claims %{"abc" => "def", "num" => 1300819380, "http://example.com/is_root" => true}
 
   defp sign_does_verify(options, claims \\ @claims) do
     jwt = JWT.sign(claims, options)

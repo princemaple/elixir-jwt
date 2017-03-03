@@ -9,3 +9,11 @@ end
 defmodule JWT.MissingKeyError do
   defexception message: "Key is required for all algorithms but 'none'"
 end
+
+defmodule JWT.ClaimValidationError do
+  defexception type: [], message: "Failed JWT claim validation"
+end
+
+defmodule JWT.SecurityError do
+  defexception [:type, :message]
+end

@@ -5,8 +5,7 @@ defmodule JWT.Algorithm.Rsa do
   see http://tools.ietf.org/html/rfc7518#section-3.3
   """
 
-  alias JWT.Algorithm.Common
-  alias JWT.Util
+  require JWT.Algorithm.SHA, as: SHA
 
   @key_bits_min 2048
 
@@ -20,8 +19,8 @@ defmodule JWT.Algorithm.Rsa do
       ...> byte_size(mac)
       256
   """
-  def sign(sha_bits, private_key, signing_input) do
-    validate_params(sha_bits, private_key)
+  def sign(sha_bits, private_key, signing_input) when SHA.valid?(sha_bits) do
+    validate_key_size!(private_key)
     :crypto.sign(:rsa, sha_bits, signing_input, private_key)
   end
 
@@ -37,25 +36,19 @@ defmodule JWT.Algorithm.Rsa do
       ...> JWT.Algorithm.Rsa.verify?(mac, :sha256, public_key, "signing_input")
       true
   """
-  def verify?(mac, sha_bits, public_key, signing_input) do
-    validate_params(sha_bits, public_key)
+  def verify?(mac, sha_bits, public_key, signing_input) when SHA.valid?(sha_bits) do
+    validate_key_size!(public_key)
     :crypto.verify(:rsa, sha_bits, signing_input, mac, public_key)
   end
 
   @doc "RSA key modulus, n"
   def modulus(key), do: :crypto.mpint(Enum.at key, 1)
 
-  defp validate_params(sha_bits, key) do
-    Common.validate_bits(sha_bits)
-    validate_key_size(key)
-  end
-
   # http://tools.ietf.org/html/rfc7518#section-3.3
-  defp validate_key_size(a_key) do
-    key = Util.validate_present(a_key)
-    weak_key(bit_size(modulus key) < @key_bits_min)
+  defp validate_key_size!(key) do
+    if bit_size(modulus key) < @key_bits_min do
+      raise JWT.SecurityError,
+        type: :rsa, message: "RSA modulus too short"
+    end
   end
-
-  defp weak_key(true), do: raise "RSA modulus too short"
-  defp weak_key(_), do: :ok
 end

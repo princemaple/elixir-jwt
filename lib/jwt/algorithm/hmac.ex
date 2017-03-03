@@ -5,8 +5,7 @@ defmodule JWT.Algorithm.Hmac do
   see http://tools.ietf.org/html/rfc7518#section-3.2
   """
 
-  alias JWT.Algorithm.Common
-  alias JWT.Util
+  require JWT.Algorithm.SHA, as: SHA
 
   @doc """
   Return a Message Authentication Code (MAC)
@@ -16,9 +15,19 @@ defmodule JWT.Algorithm.Hmac do
       ...> JWT.Algorithm.Hmac.sign(:sha256, shared_key, "signing_input")
       <<90, 34, 44, 252, 147, 130, 167, 173, 86, 191, 247, 93, 94, 12, 200, 30, 173, 115, 248, 89, 246, 222, 4, 213, 119, 74, 70, 20, 231, 194, 104, 103>>
   """
-  def sign(sha_bits, shared_key, signing_input) do
-    validate_params(sha_bits, shared_key)
+  def sign(sha_bits, shared_key, signing_input) when SHA.valid?(sha_bits) do
+    validate_key_size!(sha_bits, shared_key)
     :crypto.hmac(sha_bits, shared_key, signing_input)
+  end
+
+  # http://tools.ietf.org/html/rfc7518#section-3.2
+  defp validate_key_size!(sha_bits, key) do
+    bits = SHA.fetch_length!(sha_bits)
+
+    if byte_size(key) * 8 < bits do
+      raise JWT.SecurityError,
+        type: :hmac, message: "Key size smaller than the hash output size"
+    end
   end
 
   @doc """
@@ -31,21 +40,20 @@ defmodule JWT.Algorithm.Hmac do
       ...> JWT.Algorithm.Hmac.verify?(mac, :sha256, shared_key, "signing_input")
       true
   """
-  def verify?(mac, sha_bits, shared_key, signing_input) do
-    Util.constant_time_compare?(mac, sign(sha_bits, shared_key, signing_input))
+  def verify?(mac, sha_bits, shared_key, signing_input) when SHA.valid?(sha_bits) do
+    mac_match?(mac, sign(sha_bits, shared_key, signing_input))
   end
 
-  defp validate_params(sha_bits, key) do
-    Common.validate_bits(sha_bits)
-    |> validate_key_size(key)
+  # compares two strings for equality in constant-time to avoid timing attacks
+  defp mac_match?(expected, actual) do
+    byte_size(expected) == byte_size(actual) &&
+      arithmetic_compare(expected, actual) == 0
   end
 
-  # http://tools.ietf.org/html/rfc7518#section-3.2
-  defp validate_key_size(bits, key) do
-    key = Util.validate_present(key)
-    weak_key(byte_size(key) * 8 < bits)
+  defp arithmetic_compare(left, right, acc \\ 0)
+  defp arithmetic_compare(<<x, left::binary>>, <<y, right::binary>>, acc) do
+    import Bitwise
+    arithmetic_compare(left, right, acc ||| (x ^^^ y))
   end
-
-  defp weak_key(true), do: raise "Key size smaller than the hash output size"
-  defp weak_key(_), do: :ok
+  defp arithmetic_compare("", "", acc), do: acc
 end
