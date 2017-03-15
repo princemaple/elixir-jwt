@@ -42,7 +42,7 @@ defmodule JWT.Algorithm.Rsa do
   end
 
   @doc "RSA key modulus, n"
-  def modulus([_e, n | d]), do: :binary.encode_unsigned(n)
+  def modulus([_e, n | _d]), do: :binary.encode_unsigned(n)
 
   # http://tools.ietf.org/html/rfc7518#section-3.3
   defp validate_key_size!(key) do
