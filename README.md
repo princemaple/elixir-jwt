@@ -1,7 +1,8 @@
 # Yet another JWT lib for Elixir
 
-This is a rewrite of https://github.com/garyf/json_web_token_ex
-with https://github.com/garyf/jwt_claims_ex merged in.
+This is a rewrite of [json_web_token_ex](https://github.com/garyf/json_web_token_ex)
+with [jwt_claims_ex](https://github.com/garyf/jwt_claims_ex) merged in,
+both created by @garyf.
 
 Many things were simplified during the rewrite, code was cleaned up as well.
 
