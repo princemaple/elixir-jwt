@@ -42,11 +42,13 @@ defmodule JWT.Algorithm.Rsa do
   end
 
   @doc "RSA key modulus, n"
-  def modulus(key), do: :crypto.mpint(Enum.at key, 1)
+  def modulus([_e, n | d]), do: :binary.encode_unsigned(n)
 
   # http://tools.ietf.org/html/rfc7518#section-3.3
   defp validate_key_size!(key) do
-    if bit_size(modulus key) < @key_bits_min do
+    key_size = length(for(<<bit::1 <- modulus(key)>>, do: bit))
+
+    if key_size < @key_bits_min do
       raise JWT.SecurityError,
         type: :rsa, message: "RSA modulus too short"
     end
