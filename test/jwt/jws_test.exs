@@ -19,7 +19,7 @@ defmodule JWT.JwsTest do
     alg = "HS256"
     jws = Jws.sign(%{alg: alg}, @payload, @hs256_key)
     {:ok, verified_jws} = Jws.verify(jws, alg, @hs256_key)
-    assert verified_jws === jws
+    assert verified_jws === String.split(jws, ".")
     plausible_jws?(jws)
   end
 
@@ -45,7 +45,7 @@ defmodule JWT.JwsTest do
     alg = "none"
     jws = Jws.unsecured_message(%{alg: alg}, @payload)
     {:ok, verified_jws} = Jws.verify(jws, alg, @hs256_key) # key is ignored
-    assert verified_jws === jws
+    assert verified_jws === String.split(jws, ".")
     plausible_unsecured_jws?(jws)
   end
 

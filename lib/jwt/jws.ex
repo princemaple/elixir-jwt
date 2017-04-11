@@ -50,24 +50,24 @@ defmodule JWT.Jws do
       iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
       ...> JWT.Jws.verify(jws, "HS256", key)
-      {:ok, "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"}
+      {:ok, ["eyJhbGciOiJIUzI1NiJ9", "cGF5bG9hZA", "uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"]}
   """
-  @spec verify(binary, binary, binary) :: {:ok, binary} | {:error, atom}
+  @spec verify(binary, binary, binary) :: {:ok, [binary]} | {:error, atom}
   def verify(jws, algorithm, key) do
-    with :ok <- validate_alg(jws, algorithm),
-         jws_parts <- String.split(jws, "."),
+    with [header | _] = jws_parts <- String.split(jws, "."),
+         :ok <- validate_alg(header, algorithm),
          :ok <- verify_signature(jws_parts, algorithm, key)
     do
-      {:ok, jws}
+      {:ok, jws_parts}
     else
       {:error, reason} -> {:error, reason}
     end
   end
 
-  @spec verify!(binary, binary, binary) :: binary | no_return
+  @spec verify!(binary, binary, binary) :: [binary] | no_return
   def verify!(jws, algorithm, key) do
     case verify(jws, algorithm, key) do
-      {:ok, jws} -> jws
+      {:ok, jws_parts} -> jws_parts
       {:error, :unmatched_algorithm} ->
         raise JWT.UnmatchedAlgorithmError
       {:error, :invalid_signature} ->
@@ -77,8 +77,7 @@ defmodule JWT.Jws do
     end
   end
 
-  defp validate_alg(jws, algorithm) do
-    [header | _] = String.split(jws, ".")
+  defp validate_alg(header, algorithm) do
     header = JWT.Coding.decode!(header)
     if header["alg"] == algorithm, do: :ok, else: {:error, :unmatched_algorithm}
   end

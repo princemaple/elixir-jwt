@@ -11,7 +11,7 @@ defmodule JWT.MissingKeyError do
 end
 
 defmodule JWT.ClaimValidationError do
-  defexception type: [], message: "Failed JWT claim validation"
+  defexception claims: [], message: "Failed JWT claim validation"
 end
 
 defmodule JWT.SecurityError do

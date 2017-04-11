@@ -72,10 +72,10 @@ defmodule JWT do
 
   see http://tools.ietf.org/html/rfc7519#section-7.2
   """
-  @spec verify(binary, binary | map | Keyword.t) :: {:ok, map} | {:error, binary}
+  @spec verify(binary, map) :: {:ok, map} | {:error, binary}
   def verify(jwt, options) do
-    with {:ok, jws} <- Jws.verify(jwt, algorithm(options), unify_key(options)),
-         claims <- extract_payload!(jws),
+    with {:ok, [_, payload, _]} <- Jws.verify(jwt, algorithm(options), options[:key]),
+         claims <- JWT.Coding.decode!(payload),
          :ok <- JWT.Claim.verify(claims, options)
     do
       {:ok, claims}
@@ -84,28 +84,20 @@ defmodule JWT do
     end
   end
 
-  @spec verify!(binary, binary | map | Keyword.t) :: map | no_return
+  @spec verify!(binary, map) :: map | no_return
   def verify!(jwt, options) do
-    jws = Jws.verify!(jwt, algorithm(options), unify_key(options))
-    claims = extract_payload!(jws)
+    [_, payload, _] = Jws.verify!(jwt, algorithm(options), options[:key])
+    claims = JWT.Coding.decode!(payload)
 
     with :ok <- JWT.Claim.verify(claims, options) do
       claims
     else
       {:error, rejected_claims} ->
-        raise JWT.ClaimValidationError, type: rejected_claims
+        raise JWT.ClaimValidationError, claims: rejected_claims
     end
   end
 
   defp algorithm(options) do
     Map.get(options, :alg, @default_algorithm)
-  end
-
-  defp unify_key(binary) when is_binary(binary), do: binary
-  defp unify_key(options), do: options[:key]
-
-  defp extract_payload!(jws) do
-    [_, encoded_payload, _] = String.split(jws, ".")
-    JWT.Coding.decode!(encoded_payload)
   end
 end
