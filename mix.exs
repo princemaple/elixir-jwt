@@ -3,8 +3,8 @@ defmodule Jwt.Mixfile do
 
   def project do
     [app: :yajwt,
-     version: "1.0.1",
-     elixir: "~> 1.3",
+     version: "1.0.2",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: "Yet another JWT lib",
@@ -17,8 +17,8 @@ defmodule Jwt.Mixfile do
   end
 
   defp deps do
-    [{:poison, "~> 2.2 or ~> 3.0"},
-     {:ex_doc, "~> 0.15", only: :dev}]
+    [{:poison, "~> 2.2 or ~> 3.1"},
+     {:ex_doc, "~> 0.16", only: :dev}]
   end
 
   defp package do
