@@ -29,7 +29,7 @@ defmodule JWT do
   @spec sign(map, Keyword.t | map) :: binary
   def sign(claims, options) when is_map(claims) do
     header = unify_header(options)
-    jws_message(header, Poison.encode!(claims), options[:key])
+    jws_message(header, Jason.encode!(claims), options[:key])
   end
 
   defp jws_message(%{alg: "none"} = header, payload, _key) do
