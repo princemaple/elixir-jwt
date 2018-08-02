@@ -21,7 +21,7 @@ defmodule Jwt.Mixfile do
   defp deps do
     [
       {:jason, "~> 1.0"},
-      {:ex_doc, "~> 0.19", only: :dev}
+      {:ex_doc, "~> 0.18.0", only: :dev}
     ]
   end
 
