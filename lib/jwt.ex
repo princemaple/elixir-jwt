@@ -74,7 +74,7 @@ defmodule JWT do
 
   see http://tools.ietf.org/html/rfc7519#section-7.2
   """
-  @spec verify(binary, map) :: {:ok, map} | {:error, binary}
+  @spec verify(binary, map) :: {:ok, map} | {:error, Keyword.t()}
   def verify(jwt, options) do
     with {:ok, [_, payload, _]} <- Jws.verify(jwt, algorithm(options), options[:key]),
          claims <- JWT.Coding.decode!(payload),
