@@ -1,16 +1,24 @@
 defmodule Jwt.Mixfile do
   use Mix.Project
 
+  @version "1.1.1"
+
   def project do
     [
       app: :yajwt,
-      version: "1.1.0",
+      version: @version,
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Yet another JWT lib",
       deps: deps(),
-      package: package()
+      package: package(),
+      docs: [
+        source_ref: "v#{@version}",
+        main: "JWT",
+        canonical: "http://hexdocs.pm/yajwt",
+        source_url: "https://github.com/princemaple/elixir-jwt"
+      ]
     ]
   end
 
