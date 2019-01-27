@@ -3,8 +3,7 @@ defmodule JWT.Algorithm.RsaUtil do
 
   @doc "Load an RSA private key from a string"
   def private_key(key) do
-    {:RSAPrivateKey, :'two-prime', n, e, d, _p, _q, _e1, _e2, _c, _other} =
-      entry_decode(key)
+    {:RSAPrivateKey, :"two-prime", n, e, d, _p, _q, _e1, _e2, _c, _other} = entry_decode(key)
     [e, n, d]
   end
 
@@ -28,19 +27,20 @@ defmodule JWT.Algorithm.RsaUtil do
 
   defp entry_decode(key) do
     key
-    |> :public_key.pem_decode
-    |> List.first
-    |> :public_key.pem_entry_decode
+    |> :public_key.pem_decode()
+    |> List.first()
+    |> :public_key.pem_entry_decode()
     |> asn1_decode
   end
 
   defp asn1_decode({:PrivateKeyInfo, _, _, der_key, _}) do
     :public_key.der_decode(:RSAPrivateKey, der_key)
   end
+
   defp asn1_decode(der), do: der
 
   defp pem_read(path_to_keys, filename) do
     Path.join(path_to_keys, filename)
-    |> File.read!
+    |> File.read!()
   end
 end

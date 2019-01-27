@@ -51,12 +51,10 @@ defmodule JWT.Jwa do
 
   defp validated_alg(captures) when length(captures) == 3 do
     [_, alg, sha_bits] = captures
-    {
-      alg_module(String.downcase alg),
-      sha_prefixed(sha_bits)
-    }
+    {alg_module(String.downcase(alg)), sha_prefixed(sha_bits)}
   end
-  defp validated_alg(_), do: raise "Unrecognized algorithm"
+
+  defp validated_alg(_), do: raise("Unrecognized algorithm")
 
   defp alg_module("hs"), do: Hmac
   defp alg_module("rs"), do: Rsa

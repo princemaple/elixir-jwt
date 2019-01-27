@@ -53,8 +53,7 @@ defmodule JWT.Algorithm.Ecdsa do
     {_, der_byte_count_minimum_threshold} = @sha_bits_to_attr[sha_bits]
 
     if byte_size(der_encoded_mac) < der_byte_count_minimum_threshold do
-      raise JWT.SecurityError,
-        type: :ecdsa, message: "MAC too short"
+      raise JWT.SecurityError, type: :ecdsa, message: "MAC too short"
     end
 
     der_encoded_mac

@@ -26,7 +26,7 @@ defmodule JWT do
 
   see http://tools.ietf.org/html/rfc7519#section-7.1
   """
-  @spec sign(map, Keyword.t | map) :: binary
+  @spec sign(map, Keyword.t() | map) :: binary
   def sign(claims, options) when is_map(claims) do
     header = unify_header(options)
     jws_message(header, Jason.encode!(claims), options[:key])
@@ -35,6 +35,7 @@ defmodule JWT do
   defp jws_message(%{alg: "none"} = header, payload, _key) do
     Jws.unsecured_message(header, payload)
   end
+
   defp jws_message(header, payload, key) do
     Jws.sign(header, payload, key)
   end
@@ -48,10 +49,11 @@ defmodule JWT do
 
   Filters out unsupported claims options and ignores any encryption keys
   """
-  @spec unify_header(Keyword.t | map) :: map
+  @spec unify_header(Keyword.t() | map) :: map
   def unify_header(options) when is_list(options) do
-    options |> Map.new |> unify_header
+    options |> Map.new() |> unify_header
   end
+
   def unify_header(options) when is_map(options) do
     jose_registered_headers = Map.take(options, @header_jose_keys)
 
@@ -76,8 +78,7 @@ defmodule JWT do
   def verify(jwt, options) do
     with {:ok, [_, payload, _]} <- Jws.verify(jwt, algorithm(options), options[:key]),
          claims <- JWT.Coding.decode!(payload),
-         :ok <- JWT.Claim.verify(claims, options)
-    do
+         :ok <- JWT.Claim.verify(claims, options) do
       {:ok, claims}
     else
       {:error, reason} -> {:error, reason}

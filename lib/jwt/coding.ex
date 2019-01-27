@@ -1,7 +1,7 @@
 defmodule JWT.Coding do
   def encode!(map) do
     map
-    |> Jason.encode!
+    |> Jason.encode!()
     |> Base.url_encode64(padding: false)
   end
 

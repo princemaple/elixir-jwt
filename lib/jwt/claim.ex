@@ -22,7 +22,7 @@ defmodule JWT.Claim do
 
   Returns a list containing any registered claims that fail validation
   """
-  @spec verify(map, map) :: Keyword.t
+  @spec verify(map, map) :: Keyword.t()
   def verify(claims, options) do
     @registered_claims
     |> Enum.reduce([], fn claim, rejected ->
@@ -43,7 +43,7 @@ defmodule JWT.Claim do
   defp format_result(rejected_claims), do: {:error, rejected_claims}
 
   for claim <- @registered_claims do
-    base_name = claim |> Atom.to_string |> Macro.camelize
+    base_name = claim |> Atom.to_string() |> Macro.camelize()
     full_name = Module.concat(JWT.Claim, base_name)
     defp claim_module(unquote(claim)), do: unquote(full_name)
   end

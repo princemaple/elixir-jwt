@@ -49,8 +49,7 @@ defmodule JWT.Algorithm.Rsa do
     key_size = length(for(<<bit::1 <- modulus(key)>>, do: bit))
 
     if key_size < @key_bits_min do
-      raise JWT.SecurityError,
-        type: :rsa, message: "RSA modulus too short"
+      raise JWT.SecurityError, type: :rsa, message: "RSA modulus too short"
     end
   end
 end

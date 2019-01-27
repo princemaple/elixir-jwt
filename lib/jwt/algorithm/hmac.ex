@@ -25,8 +25,7 @@ defmodule JWT.Algorithm.Hmac do
     bits = SHA.fetch_length!(sha_bits)
 
     if byte_size(key) * 8 < bits do
-      raise JWT.SecurityError,
-        type: :hmac, message: "Key size smaller than the hash output size"
+      raise JWT.SecurityError, type: :hmac, message: "Key size smaller than the hash output size"
     end
   end
 
@@ -46,14 +45,15 @@ defmodule JWT.Algorithm.Hmac do
 
   # compares two strings for equality in constant-time to avoid timing attacks
   defp mac_match?(expected, actual) do
-    byte_size(expected) == byte_size(actual) &&
-      arithmetic_compare(expected, actual) == 0
+    byte_size(expected) == byte_size(actual) && arithmetic_compare(expected, actual) == 0
   end
 
   defp arithmetic_compare(left, right, acc \\ 0)
+
   defp arithmetic_compare(<<x, left::binary>>, <<y, right::binary>>, acc) do
     import Bitwise
-    arithmetic_compare(left, right, acc ||| (x ^^^ y))
+    arithmetic_compare(left, right, acc ||| x ^^^ y)
   end
+
   defp arithmetic_compare("", "", acc), do: acc
 end

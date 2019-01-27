@@ -20,7 +20,8 @@ defmodule JWT.Claim.Nbf do
   """
   # TODO: options for leeway_seconds
   def reject?(numeric_date, _options) when is_number(numeric_date) do
-    numeric_date > DateTime.to_unix(DateTime.utc_now)
+    numeric_date > DateTime.to_unix(DateTime.utc_now())
   end
+
   def reject?(_, _), do: true
 end

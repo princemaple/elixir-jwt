@@ -56,8 +56,7 @@ defmodule JWT.Jws do
   def verify(jws, algorithm, key) do
     with [header | _] = jws_parts <- String.split(jws, "."),
          :ok <- validate_alg(header, algorithm),
-         :ok <- verify_signature(jws_parts, algorithm, key)
-    do
+         :ok <- verify_signature(jws_parts, algorithm, key) do
       {:ok, jws_parts}
     else
       {:error, reason} -> {:error, reason}
@@ -67,11 +66,15 @@ defmodule JWT.Jws do
   @spec verify!(binary, binary, binary) :: [binary] | no_return
   def verify!(jws, algorithm, key) do
     case verify(jws, algorithm, key) do
-      {:ok, jws_parts} -> jws_parts
+      {:ok, jws_parts} ->
+        jws_parts
+
       {:error, :unmatched_algorithm} ->
         raise JWT.UnmatchedAlgorithmError
+
       {:error, :invalid_signature} ->
         raise JWT.InvalidSignatureError
+
       {:error, :missing_key} ->
         raise JWT.MissingKeyError
     end
@@ -84,6 +87,7 @@ defmodule JWT.Jws do
 
   defp verify_signature(_jws_parts, "none", _key), do: :ok
   defp verify_signature(_jws_parts, _algorithm, nil), do: {:error, :missing_key}
+
   defp verify_signature([header, message, signature], algorithm, key) do
     verified =
       signature
@@ -92,5 +96,6 @@ defmodule JWT.Jws do
 
     if verified, do: :ok, else: {:error, :invalid_signature}
   end
+
   defp verify_signature(_jws_parts, _algorithm, _key), do: {:error, :invalid_signature}
 end
