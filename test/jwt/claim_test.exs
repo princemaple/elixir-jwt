@@ -22,13 +22,11 @@ defmodule JWT.ClaimTest do
 
   @issuer "issuer"
   @jwt_id "jwt_id"
-  @subject "subject"
 
   @default_options %{
     aud: @uri,
     iss: @issuer,
-    jti: @jwt_id,
-    sub: @subject
+    jti: @jwt_id
   }
 
   @default_claims %{
@@ -37,8 +35,7 @@ defmodule JWT.ClaimTest do
     "iat" => @before_now,
     "iss" => @issuer,
     "jti" => @jwt_id,
-    "nbf" => @before_now,
-    "sub" => @subject
+    "nbf" => @before_now
   }
 
   @invalid_claims %{
@@ -47,8 +44,7 @@ defmodule JWT.ClaimTest do
     "iat" => @after_now,
     "iss" => "other issuer",
     "jti" => "other jwt_id",
-    "nbf" => @after_now,
-    "sub" => "other subject"
+    "nbf" => @after_now
   }
 
   test "verify/2 w valid claims, returns :ok" do
