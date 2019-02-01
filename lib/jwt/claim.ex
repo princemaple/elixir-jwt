@@ -5,7 +5,7 @@ defmodule JWT.Claim do
   see http://tools.ietf.org/html/rfc7519#section-4.1
   """
 
-  @registered_claims [:aud, :exp, :iat, :iss, :jti, :nbf, :sub]
+  @registered_claims [:aud, :exp, :iat, :iss, :jti, :nbf]
 
   @doc """
   Collect JWT claims that fail validation
