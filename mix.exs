@@ -7,7 +7,7 @@ defmodule Jwt.Mixfile do
     [
       app: :yajwt,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Yet another JWT lib",
