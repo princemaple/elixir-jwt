@@ -77,7 +77,7 @@ defmodule JWT do
   @spec verify(binary, map) :: {:ok, map} | {:error, Keyword.t()}
   def verify(jwt, options) do
     with {:ok, [_, payload, _]} <- Jws.verify(jwt, algorithm(options), options[:key]),
-         claims <- JWT.Coding.decode!(payload),
+         {:ok, claims} <- JWT.Coding.decode(payload),
          :ok <- JWT.Claim.verify(claims, options) do
       {:ok, claims}
     else

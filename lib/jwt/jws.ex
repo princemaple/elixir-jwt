@@ -81,8 +81,9 @@ defmodule JWT.Jws do
   end
 
   defp validate_alg(header, algorithm) do
-    header = JWT.Coding.decode!(header)
-    if header["alg"] == algorithm, do: :ok, else: {:error, :unmatched_algorithm}
+    with {:ok, header} <- JWT.Coding.decode(header) do
+      if header["alg"] == algorithm, do: :ok, else: {:error, :unmatched_algorithm}
+    end
   end
 
   defp verify_signature(_jws_parts, "none", _key), do: :ok
