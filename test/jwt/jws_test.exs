@@ -25,13 +25,13 @@ defmodule JWT.JwsTest do
 
   test "sign/3 w/o passing a matching algorithm to verify/3 raises" do
     jws = Jws.sign(%{alg: "HS256"}, @payload, @hs256_key)
-    assert {:error, :unmatched_algorithm} == Jws.verify(jws, "RS256", @hs256_key)
+    assert {:error, JWT.UnmatchedAlgorithmError} == Jws.verify(jws, "RS256", @hs256_key)
   end
 
   test "sign/3 w/o passing a key to verify/3 is false" do
     alg = "HS256"
     jws = Jws.sign(%{alg: alg}, @payload, @hs256_key)
-    assert {:error, :missing_key} == Jws.verify(jws, alg, nil)
+    assert {:error, JWT.MissingKeyError} == Jws.verify(jws, alg, nil)
   end
 
   defp plausible_unsecured_jws?(jws) do
@@ -57,6 +57,6 @@ defmodule JWT.JwsTest do
 
   test "unsecured_message/2 w/o passing a matching algorithm to verify/3 raises" do
     jws = Jws.unsecured_message(%{alg: "none"}, @payload)
-    assert {:error, :unmatched_algorithm} == Jws.verify(jws, "HS256", @hs256_key)
+    assert {:error, JWT.UnmatchedAlgorithmError} == Jws.verify(jws, "HS256", @hs256_key)
   end
 end

@@ -13,7 +13,11 @@ defmodule JWT.Coding do
 
   def decode(binary, opts \\ []) do
     with {:ok, url_decoded} <- Base.url_decode64(binary, padding: false),
-         {:ok, json_decoded} <- Jason.decode(url_decoded, opts),
-         do: {:ok, json_decoded}
+         {:ok, json_decoded} <- Jason.decode(url_decoded, opts) do
+      {:ok, json_decoded}
+    else
+      :error -> {:error, JWT.DecodeError}
+      jason_error -> jason_error
+    end
   end
 end

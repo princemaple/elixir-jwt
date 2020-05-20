@@ -29,7 +29,7 @@ defmodule JWTTest do
     wrong_key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9Z"
     options = %{alg: "HS256", key: @hs256_key}
     jwt = JWT.sign(@claims, options)
-    assert {:error, :invalid_signature} == JWT.verify(jwt, %{alg: "HS256", key: wrong_key})
+    assert {:error, JWT.InvalidSignatureError} == JWT.verify(jwt, %{alg: "HS256", key: wrong_key})
   end
 
   test "unify_header/1 w key, w/o alg returns default alg and filters key" do

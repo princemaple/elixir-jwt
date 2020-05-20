@@ -44,13 +44,38 @@ defmodule JWT.Jws do
   end
 
   @doc """
-  Return a tuple {:ok, jws (string)} if the signature is verified, or {:error, "invalid"} otherwise
+  Return a tuple {:ok, jws_parts} if the signature is verified, or {:error, exception} otherwise
 
   ## Example
       iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
       ...> JWT.Jws.verify(jws, "HS256", key)
       {:ok, ["eyJhbGciOiJIUzI1NiJ9", "cGF5bG9hZA", "uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"]}
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "invalid-key-invalid-key-invalid-key"
+      ...> JWT.Jws.verify(jws, "HS256", key)
+      {:error, JWT.InvalidSignatureError}
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.modified-content.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify(jws, "HS256", key)
+      {:error, JWT.InvalidSignatureError}
+
+      iex> jws = "eyJhb%%%%%%%%%%%%%%%.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify(jws, "HS256", key)
+      {:error, JWT.DecodeError}
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = nil
+      ...> JWT.Jws.verify(jws, "HS256", key)
+      {:error, JWT.MissingKeyError}
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify(jws, "%%%%%", key)
+      {:error, JWT.UnmatchedAlgorithmError}
   """
   @spec verify(binary, binary, binary) :: {:ok, [binary]} | {:error, atom}
   def verify(jws, algorithm, key) do
@@ -63,31 +88,59 @@ defmodule JWT.Jws do
     end
   end
 
+  @doc """
+  Return jws parts if the signature is verified, raises error otherwise
+
+  ## Example
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify!(jws, "HS256", key)
+      ["eyJhbGciOiJIUzI1NiJ9", "cGF5bG9hZA", "uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"]
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "invalid-key-invalid-key-invalid-key"
+      ...> JWT.Jws.verify!(jws, "HS256", key)
+      ** (JWT.InvalidSignatureError) Invalid Signature
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.modified-content.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify!(jws, "HS256", key)
+      ** (JWT.InvalidSignatureError) Invalid Signature
+
+      iex> jws = "eyJhb%%%%%%%%%%%%%%%.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify!(jws, "HS256", key)
+      ** (JWT.DecodeError) Failed to decode base64 string
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = nil
+      ...> JWT.Jws.verify!(jws, "HS256", key)
+      ** (JWT.MissingKeyError) Key is required for all algorithms but 'none'
+
+      iex> jws = "eyJhbGciOiJIUzI1NiJ9.cGF5bG9hZA.uVTaOdyzp_f4mT_hfzU8LnCzdmlVC4t2itHDEYUZym4"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.Jws.verify!(jws, "%%%%%", key)
+      ** (JWT.UnmatchedAlgorithmError) Algorithm not matching 'alg' header parameter
+  """
   @spec verify!(binary, binary, binary) :: [binary] | no_return
   def verify!(jws, algorithm, key) do
     case verify(jws, algorithm, key) do
       {:ok, jws_parts} ->
         jws_parts
 
-      {:error, :unmatched_algorithm} ->
-        raise JWT.UnmatchedAlgorithmError
-
-      {:error, :invalid_signature} ->
-        raise JWT.InvalidSignatureError
-
-      {:error, :missing_key} ->
-        raise JWT.MissingKeyError
+      {:error, error} ->
+        raise error
     end
   end
 
   defp validate_alg(header, algorithm) do
     with {:ok, header} <- JWT.Coding.decode(header) do
-      if header["alg"] == algorithm, do: :ok, else: {:error, :unmatched_algorithm}
+      if header["alg"] == algorithm, do: :ok, else: {:error, JWT.UnmatchedAlgorithmError}
     end
   end
 
   defp verify_signature(_jws_parts, "none", _key), do: :ok
-  defp verify_signature(_jws_parts, _algorithm, nil), do: {:error, :missing_key}
+  defp verify_signature(_jws_parts, _algorithm, nil), do: {:error, JWT.MissingKeyError}
 
   defp verify_signature([header, message, signature], algorithm, key) do
     verified =
@@ -95,8 +148,8 @@ defmodule JWT.Jws do
       |> Base.url_decode64!(padding: false)
       |> Jwa.verify?(algorithm, key, "#{header}.#{message}")
 
-    if verified, do: :ok, else: {:error, :invalid_signature}
+    if verified, do: :ok, else: {:error, JWT.InvalidSignatureError}
   end
 
-  defp verify_signature(_jws_parts, _algorithm, _key), do: {:error, :invalid_signature}
+  defp verify_signature(_jws_parts, _algorithm, _key), do: {:error, JWT.InvalidSignatureError}
 end
