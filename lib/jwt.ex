@@ -64,7 +64,7 @@ defmodule JWT do
 
   @doc """
   Return a tuple {:ok, claims (map)} if the JWT signature is verified,
-  or {:error, "invalid"} otherwise
+  or {:error, exception} otherwise
 
   ## Example
       iex> jwt ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiam9lIiwiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiOnRydWUsImRhdGV0aW1lIjoxMzAwODE5MzgwfQ.8CbXtOJ51MfPLlNTDpMMBHExFZGmqIC2c_hjuY0Dp24"
