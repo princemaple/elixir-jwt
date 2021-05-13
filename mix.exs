@@ -1,13 +1,13 @@
 defmodule Jwt.Mixfile do
   use Mix.Project
 
-  @version "1.3.0"
+  @version "1.4.0"
 
   def project do
     [
       app: :yajwt,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.9",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Yet another JWT lib",
