@@ -17,7 +17,7 @@ defmodule JWT.Algorithm.Hmac do
   """
   def sign(sha_bits, shared_key, signing_input) when SHA.valid?(sha_bits) do
     validate_key_size!(sha_bits, shared_key)
-    :crypto.hmac(sha_bits, shared_key, signing_input)
+    :crypto.mac(:hmac, sha_bits, shared_key, signing_input)
   end
 
   # http://tools.ietf.org/html/rfc7518#section-3.2
@@ -52,7 +52,7 @@ defmodule JWT.Algorithm.Hmac do
 
   defp arithmetic_compare(<<x, left::binary>>, <<y, right::binary>>, acc) do
     import Bitwise
-    arithmetic_compare(left, right, acc ||| x ^^^ y)
+    arithmetic_compare(left, right, bxor(acc ||| x, y))
   end
 
   defp arithmetic_compare("", "", acc), do: acc
