@@ -73,7 +73,7 @@ defmodule JWT do
       {:ok, %{"name" => "joe", "datetime" => 1300819380, "http://example.com/is_root" => true}}
       iex> jwt ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiam9lIiwiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiOnRydWUsImRhdGV0aW1lIjoxMzAwODE5MzgwfQ.8CbXtOJ51MfPLlNTDpMMBHExFZGmqIC2c_hjuY0Dp24"
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
-      ...> claims = JWT.verify(jwt, %{key: key, decode: [keys: :atoms]})
+      ...> JWT.verify(jwt, %{key: key, decode: [keys: :atoms]})
       {:ok, %{datetime: 1300819380, "http://example.com/is_root": true, name: "joe"}}
 
   see http://tools.ietf.org/html/rfc7519#section-7.2
