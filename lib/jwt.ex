@@ -71,13 +71,17 @@ defmodule JWT do
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
       ...> JWT.verify(jwt, %{key: key})
       {:ok, %{"name" => "joe", "datetime" => 1300819380, "http://example.com/is_root" => true}}
+      iex> jwt ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiam9lIiwiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiOnRydWUsImRhdGV0aW1lIjoxMzAwODE5MzgwfQ.8CbXtOJ51MfPLlNTDpMMBHExFZGmqIC2c_hjuY0Dp24"
+      ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
+      ...> JWT.verify(jwt, %{key: key, decode: [keys: :atoms]})
+      {:ok, %{datetime: 1300819380, "http://example.com/is_root": true, name: "joe"}}
 
   see http://tools.ietf.org/html/rfc7519#section-7.2
   """
   @spec verify(binary, map) :: {:ok, map} | {:error, Keyword.t()}
   def verify(jwt, options) do
     with {:ok, [_, payload, _]} <- Jws.verify(jwt, algorithm(options), options[:key]),
-         {:ok, claims} <- JWT.Coding.decode(payload),
+         {:ok, claims} <- JWT.Coding.decode(payload, options[:decode] || []),
          :ok <- JWT.Claim.verify(claims, options) do
       {:ok, claims}
     else
@@ -88,7 +92,7 @@ defmodule JWT do
   @spec verify!(binary, map) :: map | no_return
   def verify!(jwt, options) do
     [_, payload, _] = Jws.verify!(jwt, algorithm(options), options[:key])
-    claims = JWT.Coding.decode!(payload)
+    claims = JWT.Coding.decode!(payload, options[:decode] || [])
 
     with :ok <- JWT.Claim.verify(claims, options) do
       claims
