@@ -6,12 +6,12 @@ defmodule JWT.Claim.NbfTest do
   doctest Nbf
 
   test "reject/1 w nbf_time now returns false" do
-    nbf_time = DateTime.to_unix(DateTime.utc_now)
+    nbf_time = DateTime.to_unix(DateTime.utc_now())
     refute Nbf.reject?(nbf_time, %{})
   end
 
   test "reject/1 w nbf_time after now returns true" do
-    nbf_time = DateTime.to_unix(DateTime.utc_now) + 1
+    nbf_time = DateTime.to_unix(DateTime.utc_now()) + 1
     assert Nbf.reject?(nbf_time, %{})
   end
 

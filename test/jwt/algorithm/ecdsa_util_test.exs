@@ -4,7 +4,7 @@ defmodule JWT.Algorithm.EcdsaUtilTest do
   alias JWT.Algorithm.EcdsaUtil
 
   test "key_pair/1 default :secp256r1" do
-    {public_key, private_key} = EcdsaUtil.key_pair
+    {public_key, private_key} = EcdsaUtil.key_pair()
     assert is_binary(public_key)
     assert is_binary(private_key)
     assert byte_size(public_key) == 65

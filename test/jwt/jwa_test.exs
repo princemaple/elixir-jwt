@@ -29,11 +29,11 @@ defmodule JWT.JwaTest do
   end
 
   test "ES256 sign/3 does verify?/4" do
-     alg = "ES256"
-     {public_key, private_key} = EcdsaUtil.key_pair(:sha256)
-     mac = Jwa.sign(alg, private_key, @signing_input)
-     assert Jwa.verify?(mac, alg, public_key, @signing_input)
-   end
+    alg = "ES256"
+    {public_key, private_key} = EcdsaUtil.key_pair(:sha256)
+    mac = Jwa.sign(alg, private_key, @signing_input)
+    assert Jwa.verify?(mac, alg, public_key, @signing_input)
+  end
 
   test "HS256 destructured_alg/1" do
     assert Jwa.destructured_alg("HS256") == {JWT.Algorithm.Hmac, :sha256}
@@ -41,6 +41,7 @@ defmodule JWT.JwaTest do
 
   defp invalid_algorithm(string) do
     message = "Unrecognized algorithm"
+
     assert_raise RuntimeError, message, fn ->
       Jwa.destructured_alg(string)
     end

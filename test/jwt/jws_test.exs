@@ -44,7 +44,8 @@ defmodule JWT.JwsTest do
   test "unsecured_message/2 does verify/3 and is plausible" do
     alg = "none"
     jws = Jws.unsecured_message(%{alg: alg}, @payload)
-    {:ok, verified_jws} = Jws.verify(jws, alg, @hs256_key) # key is ignored
+    # key is ignored
+    {:ok, verified_jws} = Jws.verify(jws, alg, @hs256_key)
     assert verified_jws === String.split(jws, ".")
     plausible_unsecured_jws?(jws)
   end

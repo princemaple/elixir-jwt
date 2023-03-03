@@ -17,6 +17,6 @@ defmodule JWT.Claim.Aud do
   Returns `true` or `false`
   """
   def reject?(aud, options) do
-    not (Map.get(options, :aud) in List.wrap(aud))
+    Map.get(options, :aud) not in List.wrap(aud)
   end
 end

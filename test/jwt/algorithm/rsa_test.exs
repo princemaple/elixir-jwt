@@ -45,7 +45,9 @@ defmodule JWT.Algorithm.RsaTest do
 
   test "sign/3 w private_key size < key_bits_min raises" do
     private_key = RsaUtil.private_key(@path_to_keys, "private_key_weak.pem")
-    assert byte_size(Rsa.modulus private_key) == 250 # 2k bits == 250 bytes
+    # 2k bits == 250 bytes
+    assert byte_size(Rsa.modulus(private_key)) == 250
+
     assert_raise JWT.SecurityError, fn ->
       Rsa.sign(:sha256, private_key, @signing_input_0)
     end

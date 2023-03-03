@@ -5,7 +5,7 @@ defmodule JWTTest do
 
   @hs256_key "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
   @key_id "test-key"
-  @claims %{"abc" => "def", "num" => 1300819380, "http://example.com/is_root" => true}
+  @claims %{"abc" => "def", "num" => 1_300_819_380, "http://example.com/is_root" => true}
 
   defp sign_does_verify(options, claims \\ @claims) do
     jwt = JWT.sign(claims, options)
@@ -45,7 +45,11 @@ defmodule JWTTest do
   end
 
   test "unify_header/1 with key and key id includes the key id" do
-    assert JWT.unify_header(key: @hs256_key, kid: @key_id) == %{typ: "JWT", alg: "HS256", kid: "test-key"}
+    assert JWT.unify_header(key: @hs256_key, kid: @key_id) == %{
+             typ: "JWT",
+             alg: "HS256",
+             kid: "test-key"
+           }
   end
 
   test "unify_header/1 excludes header that is not registered" do

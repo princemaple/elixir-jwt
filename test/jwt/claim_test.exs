@@ -3,9 +3,9 @@ defmodule JWT.ClaimTest do
 
   doctest JWT.Claim
 
-  @now DateTime.to_unix(DateTime.utc_now)
-  @after_now (@now + 5)
-  @before_now (@now - 5)
+  @now DateTime.to_unix(DateTime.utc_now())
+  @after_now @now + 5
+  @before_now @now - 5
 
   test "verify/2 w rejected_claims" do
     claims = %{"exp" => @before_now}

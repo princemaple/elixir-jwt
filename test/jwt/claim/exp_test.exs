@@ -6,12 +6,12 @@ defmodule JWT.Claim.ExpTest do
   doctest Exp
 
   test "reject/1 w exp_time after now returns false" do
-    exp_time = DateTime.to_unix(DateTime.utc_now) + 1
+    exp_time = DateTime.to_unix(DateTime.utc_now()) + 1
     refute Exp.reject?(exp_time, %{})
   end
 
   test "reject/1 w exp_time now returns true" do
-    exp_time = DateTime.to_unix(DateTime.utc_now)
+    exp_time = DateTime.to_unix(DateTime.utc_now())
     assert Exp.reject?(exp_time, %{})
   end
 
