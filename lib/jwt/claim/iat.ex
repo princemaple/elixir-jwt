@@ -19,7 +19,7 @@ defmodule JWT.Claim.Iat do
   until the specified UTC date/time; non-integer values may be used
   """
   def reject?(numeric_date, _) when is_number(numeric_date) do
-    numeric_date >= DateTime.to_unix(DateTime.utc_now())
+    numeric_date > DateTime.to_unix(DateTime.utc_now())
   end
 
   def reject?(_, _), do: true
