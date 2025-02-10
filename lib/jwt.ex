@@ -22,7 +22,7 @@ defmodule JWT do
       iex> claims = %{iss: "joe", exp: 1300819380, "http://example.com/is_root": true}
       ...> key = "gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr9C"
       ...> JWT.sign(claims, key: key)
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.C5kby-t7W1CM1VB_avPCCHbtOXsNsywYAKYex8rHZh8"
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjEzMDA4MTkzODAsImlzcyI6ImpvZSIsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.3mT6HxSP5rGsHOuvCmFN25TXWTTzEi-HpEoeXlyfEYc"
 
   see http://tools.ietf.org/html/rfc7519#section-7.1
   """
