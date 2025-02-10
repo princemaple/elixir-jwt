@@ -7,7 +7,7 @@ defmodule Jwt.Mixfile do
     [
       app: :yajwt,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.13",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Yet another JWT lib",
@@ -23,7 +23,10 @@ defmodule Jwt.Mixfile do
   end
 
   def application do
-    [extra_applications: [:crypto, :logger, :public_key]]
+    [
+      extra_applications: [:crypto, :logger, :public_key],
+      env: [json_library: Jason]
+    ]
   end
 
   defp deps do
